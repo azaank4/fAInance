@@ -13,6 +13,7 @@ import keyboard
 from gtts import gTTS
 import playsound
 from re import sub
+import pyttsx3
 
 # Part 1: Extract images from the PDF and save them in the data folder
 def extract_graphs_and_diagrams(pdf_path, data_dir="data"):
@@ -87,7 +88,7 @@ def query_openrouter_models(md_file_path, models):
             response = requests.post(
                 url="https://openrouter.ai/api/v1/chat/completions",
                 headers={
-                    "Authorization": f"Bearer {YOUR_API_KEY}",
+                    "Authorization": f"Bearer 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",
                     "Content-Type": "application/json",
                 },
                 json={
@@ -148,16 +149,17 @@ def record_text():
             return ""
 
 def text_to_speech(response_text):
-    # Clean the text by removing special characters and markdown symbols
-    cleaned_text = sub(r'[^a-zA-Z0-9\s.,?!]', '', response_text)
     try:
-        tts = gTTS(text=cleaned_text, lang='en')
-        import tempfile
-        with tempfile.NamedTemporaryFile(delete=False, suffix='.mp3') as fp:
-            tts.save(fp.name)
-            playsound.playsound(fp.name)
-            import os
-            os.unlink(fp.name)
+        # Initialize the text-to-speech engine
+        engine = pyttsx3.init()
+        
+        # Clean the text
+        cleaned_text = sub(r'[^a-zA-Z0-9\s.,?!]', '', response_text)
+        
+        # Convert text to speech
+        engine.say(cleaned_text)
+        engine.runAndWait()
+        
     except Exception as e:
         print(f"TTS Error: {e}")
 
